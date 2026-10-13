@@ -32,7 +32,7 @@
 
   const A = window.HavarieApp = {
     EMBED, DATA, STEPS, STATIONS, PLACEHOLDER, todayIso, blankDraft,
-    S: { step: 'start', d: blankDraft(), mine: [], open: {}, imp: null, manual: null, showErr: {}, hostAuto: false, toast: '' },
+    S: { step: 'start', d: blankDraft(), mine: [], open: {}, imp: null, manual: null, showErr: {}, hostAuto: false, toast: '', navOpen: false },
     views: {}, actions: {}, binders: {},
   };
   const S = A.S;
@@ -250,13 +250,31 @@
       </header>
       ${meta.example_data ? html`<div class="banner" role="note">${U.ico('warn')}<div><b>${meta.banner}</b><br>Regeln, Stoffe und Standorte sind Beispiele und fachlich nicht freigegeben. Das Ergebnis ist nicht verbindlich.</div></div>` : ''}
       ${(meta.warnings && meta.warnings.length) ? html`<div class="banner banner--stop" role="alert">${U.ico('warn')}<div><b>Daten prüfen</b>${meta.warnings.map(w => html`<br>${w}`)}</div></div>` : ''}
-      ${step !== 'start' ? html`
-      <nav class="route" aria-label="Fortschritt">
-        <div class="route__now"><span>${step === 'ergebnis' ? 'Ergebnis' : 'Schritt ' + (idx + 1) + ' von ' + STATIONS.length + ': ' + STATIONS[idx].label}</span><span>${A.pflichtSummary()}</span></div>
-        <div class="stripes" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}" aria-label="Fortschritt"><i style="width:${pct}%"></i></div>
-        <ol class="route__list">${STATIONS.map((s, i) => html`<li><button type="button" class="route__btn ${(step === 'ergebnis' || i < idx) && done(s.id) ? 'is-done' : ''}" data-act="go" data-to="${s.id}" ${s.id === step ? raw('aria-current="step"') : ''}><b>${(step === 'ergebnis' || i < idx) && done(s.id) ? U.ico('check') : i + 1}</b>${s.label}</button></li>`)}</ol>
-      </nav>` : ''}`;
+      `;
   }
+  // Persistent station status: lives outside #chrome so sticky works across the full page.
+  function statusHtml() {
+    const step = S.step, idx = STATIONS.findIndex(s => s.id === step);
+    const num = idx >= 0 ? idx + 1 : step === 'ergebnis' ? STATIONS.length : 0;
+    const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : STATIONS[idx].label;
+    const pct = Math.round(num * 100 / STATIONS.length);
+    const done = id => A.missing(id).length === 0 && (STATIONS.findIndex(st => st.id === id) < (idx < 0 ? (step === 'ergebnis' ? 99 : 0) : idx));
+    return html`
+      <div class="dock__top">
+        <div class="dock__identity"><span class="dock__dot" aria-hidden="true"></span><strong>${label}</strong><span class="dock__step">${step === 'start' ? 'Start' : step === 'ergebnis' ? 'Ergebnis' : 'Station ' + num + '/' + STATIONS.length}</span></div>
+        <span class="dock__safety" title="Beispieldaten, keine fachliche Freigabe">Demo · nicht freigegeben</span>
+      </div>
+      <div class="dock__bottom">
+        <div class="dock__progress" role="progressbar" aria-label="Durchlaufene Stationen" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
+        <span class="dock__count">${A.pflichtSummary()}</span>
+        <button class="dock__toggle" type="button" data-act="nav-toggle" aria-expanded="${!!S.navOpen}" aria-controls="dock-navigation">${S.navOpen ? 'Schließen' : 'Stationen'} <span aria-hidden="true">${S.navOpen ? '↑' : '↓'}</span></button>
+      </div>
+      <nav class="dock__navigation" id="dock-navigation" aria-label="Stationen und Schritte" ${S.navOpen ? '' : raw('hidden')}>
+        ${STATIONS.map((st, i) => html`<button type="button" class="dock__link ${done(st.id) ? 'is-done' : ''}" data-act="go" data-to="${st.id}" ${st.id === step ? raw('aria-current="step"') : ''}><span>${done(st.id) ? U.ico('check') : i + 1}</span>${st.label}</button>`)}
+        <button type="button" class="dock__link dock__link--result" data-act="go" data-to="ergebnis" ${step === 'ergebnis' ? raw('aria-current="step"') : ''}><span>✓</span>Vorab-Ergebnis</button>
+      </nav>`;
+  }
+  A.actions['nav-toggle'] = () => { S.navOpen = !S.navOpen; A.render(); };
   A.pflichtSummary = function () {
     try {
       const { res } = A.evaluate();
@@ -264,12 +282,17 @@
     } catch (e) { return ''; }
   };
 
+  function updateDockCompact() {
+    const el = $('status-dock');
+    if (el) el.classList.toggle('is-compact', window.scrollY > 100);
+  }
   let lastStep = S.step;
   A.render = function (opts) {
     const o = opts || {};
     const focusId = document.activeElement && document.activeElement.id;
     const view = A.views[S.step] || A.views.start;
     $('chrome').innerHTML = chromeHtml().s;
+    $('status-dock').innerHTML = statusHtml().s;
     $('stage').innerHTML = view().s;
     $('app').classList.toggle('sticky', !(EMBED && S.hostAuto));
     if (S.step !== lastStep || o.focusHeading) {
@@ -279,6 +302,7 @@
     } else if (focusId && $(focusId)) {
       $(focusId).focus({ preventScroll: true });
     }
+    updateDockCompact();
     A.postHeight();
   };
   A.rerender = () => A.render();
@@ -287,6 +311,7 @@
     if (!STEPS.includes(step)) return;
     const o = opts || {};
     S.step = step;
+    S.navOpen = false;
     if (!o.noHistory) { try { history.pushState({ step }, '', '#' + step); } catch (e) { /* ignorieren */ } }
     save();
     A.render({ focusHeading: true });
@@ -399,6 +424,7 @@
     root.addEventListener('input', onInput);
     root.addEventListener('toggle', onToggle, true);
     window.addEventListener('message', onMessage);
+    window.addEventListener('scroll', updateDockCompact, { passive: true });
     window.addEventListener('popstate', () => {
       const h = location.hash.replace('#', '');
       S.step = STEPS.includes(h) ? h : 'start';

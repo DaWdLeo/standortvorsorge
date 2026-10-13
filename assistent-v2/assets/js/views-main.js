@@ -68,7 +68,13 @@
         <div class="hero__grid">
           <div>
             <h1 id="h-start" data-heading>Vor dem Einsatz: Gefahrstoff-Check für die Baustelle</h1>
-            <p class="hero__lead">Sechs kurze Stationen, dann ein Vorab-Ergebnis: Was ist noch zu klären, bevor es losgeht?</p>
+            <p class="hero__lead">Standort, Umweltbedingungen, Stoff und Notfallausrüstung prüfen – mit dem Ziel, Umweltschäden vorzubeugen und im Ereignisfall deren Folgen zu begrenzen.</p>
+            <p class="hint">Orientierung an der Notfallvorsorge nach ISO 14001, Abschnitt 8.2. Keine geprüfte Notfallanweisung und keine Einsatzfreigabe.</p>
+            <div class="process-phases" aria-label="Ablauf der Umweltnotfallvorsorge">
+              <span><b>01</b> Vorbeugen</span>
+              <span><b>02</b> Reaktion vorbereiten</span>
+              <span><b>03</b> Ereignisse nachbereiten</span>
+            </div>
             <ol class="steps">
               <li><b>Ort:</b> Standort und Einsatzstelle</li>
               <li><b>Umgebung:</b> Untergrund, Kanäle, Gewässer</li>

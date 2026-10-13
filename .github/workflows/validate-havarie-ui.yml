@@ -1,0 +1,45 @@
+name: Validate Havarie UI
+on:
+  pull_request:
+    paths:
+      - "assistent-v2/**"
+      - "assistent/**"
+      - ".github/workflows/validate-havarie-ui.yml"
+  push:
+    branches:
+      - ui-havarie-navigation-20261014
+    paths:
+      - "assistent-v2/**"
+      - "assistent/**"
+      - ".github/workflows/validate-havarie-ui.yml"
+permissions:
+  contents: read
+jobs:
+  static-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          for f in assistent-v2/assets/js/*.js assistent-v2/data/regelwerk.js assistent-v2/embed.js assistent/app.js; do
+            if [ -f "$f" ]; then node --check "$f"; fi
+          done
+      - name: Verify status, navigation and static demo boundaries
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          page = Path('assistent-v2/index.html').read_text(encoding='utf-8')
+          app = Path('assistent-v2/assets/js/app.js').read_text(encoding='utf-8')
+          css = Path('assistent-v2/assets/css/app.css').read_text(encoding='utf-8')
+          home = Path('assistent-v2/assets/js/views-main.js').read_text(encoding='utf-8')
+          legacy = Path('assistent/index.html').read_text(encoding='utf-8')
+          assert 'id="status-dock"' in page
+          assert 'dock__navigation' in app and "A.actions['nav-toggle']" in app
+          assert '.status-dock {' in css and 'position: sticky' in css
+          assert 'overflow-wrap: anywhere' in css
+          assert 'ISO 14001' in home and 'Keine geprüfte Notfallanweisung' in home
+          assert 'Demo · nicht freigegeben' in app
+          assert 'legacy-release-tile' in legacy
+          assert 'data/regelwerk.js' in page
+          print('UI checks passed')
+          PY
