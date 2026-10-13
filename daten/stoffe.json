@@ -1,0 +1,56 @@
+[
+  {
+    "id": "DEMO-001",
+    "name": "Dieselkraftstoff",
+    "group": "Kraftstoffe",
+    "keywords": ["Diesel", "Tank", "Baumaschine", "Kraftstoff"],
+    "document": { "id": "SDB-DEMO-001", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  },
+  {
+    "id": "DEMO-002",
+    "name": "Hydrauliköl HLP 46",
+    "group": "Öle & Schmierstoffe",
+    "keywords": ["Öl", "Hydraulik", "Schmieröl", "Wartung"],
+    "document": { "id": "SDB-DEMO-002", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  },
+  {
+    "id": "DEMO-003",
+    "name": "Betontrennmittel",
+    "group": "Bauchemie",
+    "keywords": ["Schalung", "Trennmittel", "Beton", "Bauhilfsstoff"],
+    "document": { "id": "SDB-DEMO-003", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  },
+  {
+    "id": "DEMO-004",
+    "name": "Wasserbasierter Baustellenreiniger",
+    "group": "Reinigung",
+    "keywords": ["Reiniger", "Reinigung", "Waschen"],
+    "document": { "id": "SDB-DEMO-004", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  },
+  {
+    "id": "DEMO-005",
+    "name": "Epoxidharz – Komponente A",
+    "group": "Bauchemie",
+    "keywords": ["Beschichtung", "Epoxid", "Harz", "Boden"],
+    "document": { "id": "SDB-DEMO-005", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  },
+  {
+    "id": "DEMO-006",
+    "name": "Motoröl 10W-40",
+    "group": "Öle & Schmierstoffe",
+    "keywords": ["Motoröl", "Schmierstoff", "Maschine", "Wartung"],
+    "document": { "id": "SDB-DEMO-006", "version": "Beispiel / ungeprüft", "date": "–" },
+    "wgk": "nicht geprüft",
+    "reviewed": false
+  }
+]
