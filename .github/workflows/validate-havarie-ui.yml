@@ -48,7 +48,7 @@ jobs:
           for area in ('Übersicht', 'Standort', 'Gefahrstoffe', 'Vorsorge', 'Notfallplan'):
               assert area in page
           assert "A.views.notfall" in industrial and 'Keine freigegebenen Einsatzunterlagen' in industrial
-          assert 'A.views.start' in industrial and 'fachliche Prüfung' in industrial.lower()
+          assert 'A.views.start' in industrial and 'fachliche prüfung' in industrial.lower()
           assert '.industrial-bottom-nav' in design and '.industrial-sidebar' in design
           assert 'position:fixed' in design and '100dvh' in design
           assert 'window.HavarieEngine' not in industrial
