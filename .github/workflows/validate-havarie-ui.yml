@@ -8,6 +8,7 @@ on:
   push:
     branches:
       - ui-havarie-navigation-20261014
+      - modern-industrial-ui-20261014
     paths:
       - "assistent-v2/**"
       - "assistent/**"
@@ -41,5 +42,16 @@ jobs:
           assert 'Demo · nicht freigegeben' in app
           assert 'legacy-release-tile' in legacy
           assert 'data/regelwerk.js' in page
+          industrial = Path('assistent-v2/assets/js/industrial.js').read_text(encoding='utf-8')
+          design = Path('assistent-v2/assets/css/industrial.css').read_text(encoding='utf-8')
+          assert 'industrial.js' in page and 'industrial.css' in page
+          for area in ('Übersicht', 'Standort', 'Gefahrstoffe', 'Vorsorge', 'Notfallplan'):
+              assert area in page
+          assert "A.views.notfall" in industrial and 'Keine freigegebenen Einsatzunterlagen' in industrial
+          assert 'A.views.start' in industrial and 'fachliche Prüfung' in industrial.lower()
+          assert '.industrial-bottom-nav' in design and '.industrial-sidebar' in design
+          assert 'position:fixed' in design and '100dvh' in design
+          assert 'window.HavarieEngine' not in industrial
+
           print('UI checks passed')
           PY
