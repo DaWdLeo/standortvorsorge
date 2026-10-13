@@ -258,7 +258,7 @@
     const num = idx >= 0 ? idx + 1 : step === 'ergebnis' ? STATIONS.length : 0;
     const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : STATIONS[idx].label;
     const pct = Math.round(num * 100 / STATIONS.length);
-    const done = id => A.missing(id).length === 0;
+    const done = id => A.missing(id).length === 0 && (STATIONS.findIndex(st => st.id === id) < (idx < 0 ? (step === 'ergebnis' ? 99 : 0) : idx));
     return html`
       <div class="dock__top">
         <div class="dock__identity"><span class="dock__dot" aria-hidden="true"></span><strong>${label}</strong><span class="dock__step">${step === 'start' ? 'Start' : step === 'ergebnis' ? 'Ergebnis' : 'Station ' + num + '/' + STATIONS.length}</span></div>
