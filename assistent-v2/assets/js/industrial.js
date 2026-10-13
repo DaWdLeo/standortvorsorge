@@ -8,7 +8,8 @@ const titles={start:'Übersicht',ort:'Standort',stoff:'Gefahrstoffe',ausruestung
 const keepGo=A.go;
 A.go=function(step,opts){if(step==='notfall'){A.S.step='notfall';A.S.navOpen=false;try{history.pushState({step},'','#notfall')}catch{}A.save();A.render({focusHeading:true});A.scrollTop();return}keepGo(step,opts)};
 A.STEPS.push('notfall');
-A.S.themeChoice=localStorage.getItem('havarie.theme')||'system';
+try { A.S.themeChoice=localStorage.getItem('havarie.theme')||'system'; } catch { A.S.themeChoice='system'; }
+if(A.S.themeChoice==='light'||A.S.themeChoice==='dark')document.documentElement.dataset.theme=A.S.themeChoice;
 A.actions['theme-toggle']=()=>{let cur=A.S.themeChoice,next=cur==='system'?'light':cur==='light'?'dark':'system';A.S.themeChoice=next;try{localStorage.setItem('havarie.theme',next)}catch{}if(next==='system')document.documentElement.removeAttribute('data-theme');else document.documentElement.dataset.theme=next;A.toast('Darstellung: '+({system:'System',light:'Hell',dark:'Dunkel'}[next]))};
 function clean(v){return v===null||v===undefined||v===''?'Nicht hinterlegt':String(v)}
 function emergencyInformation(){
