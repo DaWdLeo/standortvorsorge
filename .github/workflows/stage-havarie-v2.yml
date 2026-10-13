@@ -1,0 +1,77 @@
+name: Stage Havarie Pages v2
+on:
+  push:
+    branches:
+      - vorbereitung-havarie-anpassung-20261013
+    paths:
+      - incoming/Havarie_Assistent_Pages_Integrationspaket.zip
+
+permissions:
+  contents: write
+
+concurrency:
+  group: stage-havarie-v2
+  cancel-in-progress: false
+
+jobs:
+  unpack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify and unpack neutral demo bundle
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          import hashlib, zipfile
+
+          source = Path("incoming/Havarie_Assistent_Pages_Integrationspaket.zip")
+          if not source.is_file():
+              raise SystemExit("Integration ZIP not found.")
+          digest = hashlib.sha256(source.read_bytes()).hexdigest()
+          if digest != "534074f0f807b9c58159d3463103bbb3252fae8486e175197b0923bce6c5f41f":
+              raise SystemExit("SHA256 mismatch: do not unpack unexpected content.")
+          with zipfile.ZipFile(source) as bundle:
+              files = [i for i in bundle.infolist() if not i.is_dir()]
+              if len(files) != 21:
+                  raise SystemExit(f"Unexpected ZIP file count: {len(files)}")
+              for entry in files:
+                  parts = PurePosixPath(entry.filename).parts
+                  if not parts or parts[0] not in ("assistent-v2", "INTEGRATION.md"):
+                      raise SystemExit(f"Unexpected file: {entry.filename}")
+                  if any(p in (".", "..") for p in parts) or entry.filename.startswith("/"):
+                      raise SystemExit(f"Unsafe path: {entry.filename}")
+                  if entry.file_size > 2_000_000:
+                      raise SystemExit(f"Unexpected large file: {entry.filename}")
+                  if parts[0] == "INTEGRATION.md":
+                      continue
+                  out = Path(*parts)
+                  out.parent.mkdir(parents=True, exist_ok=True)
+                  out.write_bytes(bundle.read(entry.filename))
+          expected = [
+              "assistent-v2/index.html",
+              "assistent-v2/data/regelwerk.json",
+              "assistent-v2/data/regelwerk.js",
+              "assistent-v2/assets/js/engine.js",
+              "assistent-v2/assets/css/app.css",
+          ]
+          assert all(Path(p).exists() for p in expected)
+          print("Verified and extracted static v2 application.")
+          PY
+      - name: Check JavaScript
+        run: |
+          for file in assistent-v2/assets/js/*.js assistent-v2/data/regelwerk.js assistent-v2/embed.js; do
+            node --check "$file"
+          done
+      - name: Commit only staged web application to working branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- assistent-v2
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Stage verified Havarie Pages v2 static demo"
+            git push origin HEAD:vorbereitung-havarie-anpassung-20261013
+          fi
