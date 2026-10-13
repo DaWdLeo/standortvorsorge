@@ -256,8 +256,8 @@
   function statusHtml() {
     const step = S.step, idx = STATIONS.findIndex(s => s.id === step);
     const num = idx >= 0 ? idx + 1 : step === 'ergebnis' ? STATIONS.length : 0;
-    const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : STATIONS[idx].label;
-    const pct = Math.round(num * 100 / STATIONS.length);
+    const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : step === 'notfall' ? 'Notfallplan' : STATIONS[idx].label;
+    const pct = step === 'notfall' ? 0 : Math.round(num * 100 / STATIONS.length);
     const done = id => A.missing(id).length === 0 && (STATIONS.findIndex(st => st.id === id) < (idx < 0 ? (step === 'ergebnis' ? 99 : 0) : idx));
     return html`
       <div class="dock__top">
@@ -267,6 +267,7 @@
       <div class="dock__bottom">
         <div class="dock__progress" role="progressbar" aria-label="Durchlaufene Stationen" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
         <span class="dock__count">${A.pflichtSummary()}</span>
+        <button class="dock__toggle industrial-quick-emergency" type="button" data-act="go" data-to="notfall" aria-label="Notfallinformationen direkt öffnen">Notfall</button>
         <button class="dock__toggle" type="button" data-act="nav-toggle" aria-expanded="${!!S.navOpen}" aria-controls="dock-navigation">${S.navOpen ? 'Schließen' : 'Stationen'} <span aria-hidden="true">${S.navOpen ? '↑' : '↓'}</span></button>
       </div>
       <nav class="dock__navigation" id="dock-navigation" aria-label="Stationen und Schritte" ${S.navOpen ? '' : raw('hidden')}>
