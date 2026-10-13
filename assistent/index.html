@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Havarie-Assistent · GitHub Pages Demo (ohne Excel)</title>
   <link rel="stylesheet" href="./styles.css">
+<style>.legacy-release-tile{display:none!important}</style>
 </head>
 <body><div role="status" class="pages-banner"><strong>DEMO · NICHT FREIGEGEBEN</strong><span>GitHub Pages zeigt nur die Benutzeroberfläche. Keine Excel-Bewertung, keine fachliche Freigabe, keine PDF-Erzeugung und keine operativen Notfallmaßnahmen. Bitte ausschließlich fiktive Testdaten eingeben.</span></div>
 <header class="topbar">
@@ -64,7 +65,7 @@
         <article class="card metric"><span>Offene Maßnahmen</span><strong id="dashOpen">–</strong></article>
         <article class="card metric"><span>Aktive Sperren</span><strong id="dashBlocks">–</strong></article>
         <article class="card metric"><span>Ereignismodus</span><strong id="dashEvent">–</strong></article>
-        <article class="card metric"><span>Freigabedokument</span><strong id="dashDocument">–</strong></article>
+        <article class="card metric legacy-release-tile"><span>Freigabedokument</span><strong id="dashDocument">–</strong></article>
       </div>
 
       <div class="guide-box guide-info">
@@ -81,8 +82,8 @@
           <div><span>Aktueller Einsatz</span><strong id="processCase">–</strong></div>
           <div><span>Bewertungsergebnis</span><strong id="processEvaluation">–</strong></div>
           <div><span>Fachprüfung</span><strong id="processReview">–</strong></div>
-          <div><span>Wirksame Freigabe</span><strong id="processRelease">–</strong></div>
-          <div><span>Freigabedokument</span><strong id="processDocument">–</strong></div>
+          <div class="legacy-release-tile"><span>Wirksame Freigabe</span><strong id="processRelease">–</strong></div>
+          <div class="legacy-release-tile"><span>Freigabedokument</span><strong id="processDocument">–</strong></div>
         </div>
       </div>
 
@@ -97,7 +98,7 @@
           <i>→</i>
           <button data-go="event" class="danger-step"><b>4</b><span>Im Ereignis handeln</span></button>
           <i>→</i>
-          <div class="journey-status-step"><b>5</b><span>Freigabedokument</span><small id="processDocumentStatus">noch nicht möglich</small></div>
+          <div class="journey-status-step legacy-release-tile"><b>5</b><span>Freigabedokument</span><small id="processDocumentStatus">noch nicht möglich</small></div>
         </div>
       </div>
     </section>
@@ -248,7 +249,7 @@
         <div><span class="card-label">GESAMTSTATUS</span><h2 id="overallStatus">–</h2><p id="effectiveStatus">–</p></div>
         <div id="statusBadge" class="status-badge neutral">STATUS</div>
       </div>
-      <div class="release-document-card card" id="resultDocumentCard">
+      <div class="release-document-card card legacy-release-tile" id="resultDocumentCard">
         <div>
           <span class="card-label">FREIGABEDOKUMENT</span>
           <h3 id="resultDocumentTitle">Noch kein freigegebener Stand vorhanden</h3>
@@ -260,7 +261,7 @@
 
       <div class="result-grid">
         <article class="card result-card"><h3>Was ist jetzt zu tun?</h3><div id="actionText" class="multiline"></div></article>
-        <article class="card result-card"><h3>Freigabekette</h3><dl>
+        <article class="card result-card legacy-release-tile"><h3>Freigabekette</h3><dl>
           <div><dt>Automatisch</dt><dd id="automaticRelease"></dd></div>
           <div><dt>Manuell gewählt</dt><dd id="manualRelease"></dd></div>
           <div><dt>Wirksam</dt><dd id="effectiveRelease"></dd></div>
@@ -316,7 +317,7 @@
         </div>
       </div>
 
-      <div class="release-document-card card" id="releaseDocumentCard">
+      <div class="release-document-card card legacy-release-tile" id="releaseDocumentCard">
         <div>
           <span class="card-label">FREIGABEDOKUMENT</span>
           <h3 id="releaseDocumentTitle">Noch kein freigegebener Stand vorhanden</h3>
