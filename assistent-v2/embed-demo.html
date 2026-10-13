@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Einbettung: Havarie-Assistent Gefahrstoffe</title>
+<meta name="robots" content="noindex">
+<style>
+  body { margin: 0; font: 17px/1.5 "Segoe UI", system-ui, sans-serif; background: #f6f7f8; color: #1b1f23; }
+  .page { max-width: 900px; margin: 0 auto; padding: 24px 16px 60px; }
+  h1 { font-size: 1.6rem; margin: 0 0 8px; } h2 { font-size: 1.2rem; margin: 28px 0 8px; }
+  pre { background: #1b1f23; color: #f1f3f4; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: .85rem; }
+  .frame-box { border: 2px dashed #a9b0b7; border-radius: 10px; padding: 8px; background: #fff; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Beispiel: Havarie-Assistent auf einer fremden Seite</h1>
+  <p>Diese Seite zeigt, wie der Assistent per iframe eingebunden wird. Der Rahmen unten passt seine Höhe automatisch an.</p>
+  <div class="frame-box"><div id="havarie"></div></div>
+  <script src="embed.js" data-target="#havarie"></script>
+
+  <h2>Variante 1: mit embed.js (empfohlen, automatische Höhe)</h2>
+  <pre>&lt;div id="havarie"&gt;&lt;/div&gt;
+&lt;script src="https://NUTZER.github.io/REPO/embed.js" data-target="#havarie"&gt;&lt;/script&gt;</pre>
+
+  <h2>Variante 2: einfacher iframe (feste Höhe, Inhalt scrollt im Rahmen)</h2>
+  <pre>&lt;iframe src="https://NUTZER.github.io/REPO/?embed=1"
+        title="Havarie-Assistent Gefahrstoffe"
+        style="width:100%;height:900px;border:0"
+        loading="lazy" allow="clipboard-write"&gt;&lt;/iframe&gt;</pre>
+  <p>Hinweis: Wird der iframe mit dem Attribut <code>sandbox</code> eingeschränkt, braucht er mindestens <code>allow-scripts allow-same-origin allow-downloads allow-popups allow-modals</code> (Speichern im Browser, CSV-Export, Drucken).</p>
+</div>
+</body>
+</html>
