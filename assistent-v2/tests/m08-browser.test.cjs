@@ -102,7 +102,7 @@ test('M08 embedded host: iframe sends height updates and can open emergency pane
  try{
   const frame=page.frameLocator('iframe[title="Havarie-Assistent Gefahrstoffe"]');
   await frame.locator('#stage [data-heading]').first().waitFor();
-  await frame.locator('.industrial-bottom-item[data-to="notfall"]').click();
+  await frame.locator('.industrial-nav-item[data-to="notfall"]:visible, .industrial-bottom-item[data-to="notfall"]:visible').first().click();
   await frame.getByText('Keine freigegebenen Einsatzunterlagen verfügbar.').waitFor();
   const box=await page.locator('iframe').evaluate(el=>({height:el.getBoundingClientRect().height,width:el.getBoundingClientRect().width,client:el.parentElement.getBoundingClientRect().width}));
   assert.ok(box.height>=520,'iframe height under minimum '+box.height);
