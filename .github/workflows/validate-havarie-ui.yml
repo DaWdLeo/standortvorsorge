@@ -12,6 +12,7 @@ on:
       - fix-unit-layout-print-report-20261014
       - p1-fail-closed-iso14001-2026-20261014
       - p2-site-documentation-20261014
+      - m07-pruefprotokoll-entwurf-20261014
     paths:
       - "assistent-v2/**"
       - "assistent/**"
@@ -32,6 +33,8 @@ jobs:
         run: node --test assistent-v2/tests/p1-safety.test.js
       - name: P2 site documentation regression tests
         run: node --test assistent-v2/tests/p2-site.test.js
+      - name: M07 snapshot and trace tests
+        run: node --test assistent-v2/tests/m07-report.test.js
       - name: Verify status, navigation and static demo boundaries
         run: |
           python3 - <<'PY'

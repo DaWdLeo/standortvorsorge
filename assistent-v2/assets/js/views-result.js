@@ -175,6 +175,7 @@
         <div class="actions__right">
           <button class="btn" type="button" data-act="copy-summary">${ico('copy')}Zusammenfassung kopieren</button>
           <button class="btn" type="button" data-act="print">${ico('print')}Prüfprotokoll als PDF</button>
+          <button class="btn" type="button" data-act="export-audit">Prüfdatensatz (JSON)</button>
         </div>
       </div>
 
