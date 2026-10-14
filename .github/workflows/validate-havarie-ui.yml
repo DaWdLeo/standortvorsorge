@@ -49,7 +49,9 @@ jobs:
           assert '.status-dock {' in css and 'position: sticky' in css
           assert 'overflow-wrap: anywhere' in css
           assert 'ISO 14001' in home and 'Keine geprüfte Notfallanweisung' in home
-          assert 'Demo · nicht freigegeben' in app
+          assert 'Freigabe: ausstehend' in app
+          assert 'meta.example_data ? html' not in app
+          assert 'industrial-pilot-badge' in page
           assert 'legacy-release-tile' in legacy
           assert 'data/regelwerk.js' in page
           industrial = Path('assistent-v2/assets/js/industrial.js').read_text(encoding='utf-8')
