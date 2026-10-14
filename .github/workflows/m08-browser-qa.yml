@@ -1,0 +1,43 @@
+name: M08 Real Browser QA
+on:
+  pull_request:
+    paths:
+      - "assistent-v2/**"
+      - ".github/workflows/m08-browser-qa.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser test runner and Chromium
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq poppler-utils
+      - name: Serve the actual checked-out static GitHub Pages application
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/havarie-http.log 2>&1 &
+          for i in $(seq 1 40); do
+            if curl -fsS http://127.0.0.1:8765/assistent-v2/index.html >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/havarie-http.log
+          exit 1
+      - name: Browser end-to-end, responsive and A4 PDF checks
+        run: node --test assistent-v2/tests/m08-browser.test.cjs
+      - name: Keep fictional browser screenshots and PDF QA reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m08-browser-evidence
+          path: assistent-v2/tests/artifacts/
+          retention-days: 14
+          if-no-files-found: ignore
