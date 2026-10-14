@@ -16,11 +16,12 @@
   A.verdict = function (res) {
     const stationsOpen = ['ort', 'umgebung', 'stoff', 'taetigkeit', 'ausruestung'].filter(id => A.missing(id).length);
     const sub = res.substance, stoffFrei = sub && String(sub.Freigabestatus).toLowerCase() === 'freigegeben';
+    const invalidInput = res.input_validation && !res.input_validation.valid;
     const stopCond = res.blocks > 0 || res.sperrgruende_offen === 1 || res.overall_status === 'NICHT FREIGABEFAEHIG';
     // Fehlende Ausrüstungsangaben können nur weitere Sperren auslösen: Ist schon eine Sperre aktiv, gilt "Stopp".
     const onlyEquipmentOpen = stationsOpen.length === 1 && stationsOpen[0] === 'ausruestung';
     let key;
-    if (stationsOpen.length && !(onlyEquipmentOpen && stopCond)) key = 'unvollstaendig';
+    if (invalidInput || (stationsOpen.length && !(onlyEquipmentOpen && stopCond))) key = 'unvollstaendig';
     else if (stopCond) key = 'stop';
     else if (res.rule_hits === 0 || res.fachpruefung_erforderlich === 'Ja' || res.overall_status === 'FACHPRUEFUNG ERFORDERLICH' || !sub || !stoffFrei) key = 'fachpruefung';
     else if (!res.complete || !res.pflicht.complete || res.ui_guard.active) key = 'unvollstaendig';
@@ -64,8 +65,11 @@
 
   function reportCards(res) {
     const ids = [...new Set(res.rules.filter(r => r.hit && r.Meldekriterium_ID).map(r => r.Meldekriterium_ID))];
-    const list = ids.length ? ids : ['MK01'];
-    return list.map(id => DATA.reporting_criteria.find(k => k.Meldekriterium_ID === id)).filter(Boolean).map(k => html`
+    // No implicit reporting criterion: an unmatched rule never creates a reporting obligation.
+    const list = ids;
+    const checked = list.map(id => DATA.reporting_criteria.find(k => k.Meldekriterium_ID === id)).filter(k => k && !DATA.meta.example_data && ['Freigegeben', 'Aktiv'].includes(k.Freigabestatus));
+    if (!checked.length) return html`<p class="muted">Keine fachlich freigegebenen und zugeordneten Meldekriterien verfügbar. Meldung und Eskalation anhand der betrieblich freigegebenen Unterlagen prüfen.</p>`;
+    return checked.map(k => html`
       <div class="measure"><h4>${k.Bezeichnung}</h4>
         <p class="muted small">${String(k.Interne_Meldung_erforderlich).toLowerCase() === 'ja' ? 'Interne Meldung erforderlich' : 'Interne Meldung nicht vorgesehen'}${String(k.Externe_Pruefung_erforderlich).toLowerCase() === 'ja' ? ' | externe Prüfung erforderlich' : ''}</p>
         <dl><dt>Auslöser</dt><dd>${k.Ausloeser}</dd><dt>An wen</dt><dd>${k.Moegliche_Empfaengerfunktion}</dd><dt>Wer meldet</dt><dd>${k.Meldebefugnis || '–'}</dd>
@@ -141,6 +145,7 @@
     const { res } = A.evaluate();
     const v = A.verdict(res), vd = C.verdicts[v.key];
     const rs = reasons(res, v);
+    if (res.input_validation && !res.input_validation.valid) res.input_validation.issues.forEach(x => rs.unshift({tone:'warn', title:'Ungültige Angabe: '+x.field, text:x.message, goto:'taetigkeit'}));
     const signSvg = { stop: I.stopSign('Stopp'), info: I.infoSign('Hinweis'), warn: I.warnSign('bang', 'Warnung') }[vd.sign];
     const ch = A.currentSubstance(), hz = A.hazardOf(ch), proj = A.project(), d = S.d;
     const act = DATA.activities.find(a => a.Taetigkeit_ID === d.activityId);
@@ -194,7 +199,7 @@
         ${res.excluded_measures.length ? html`<details class="more"><summary>Nicht anzeigbare Maßnahmen (${res.excluded_measures.length})</summary>${res.excluded_measures.map(x => html`<div class="measure measure--no"><h4>${x.Titel || x.Massnahme_ID}</h4><p class="muted small">Regel ${x.Regel_ID}${String(x.Pflichtmassnahme).toLowerCase() === 'ja' ? ', Pflichtmaßnahme' : ''}</p><p>${x.Grund}</p></div>`)}</details>` : ''}
       </section>
 
-      <section class="card" aria-labelledby="h-report"><h3 id="h-report">Wann und wem melden</h3>${reportCards(res)}${U.learnCard('meldung', { open: S.open, data: DATA })}</section>
+      <section class="card" aria-labelledby="h-report"><h3 id="h-report">Meldung und Eskalation prüfen</h3>${reportCards(res)}${U.learnCard('meldung', { open: S.open, data: DATA })}</section>
 
       <section class="card" aria-labelledby="h-emerg"><h3 id="h-emerg">Wenn etwas ausläuft</h3>
         <ol class="ordered">${DATA.event.general_actions.map(x => html`<li>${x.replace(/^\d+\.\s*/, '')}</li>`)}</ol>
