@@ -274,7 +274,6 @@
         <div class="brand">${raw(I.warnSign('bang', 'Warnzeichen'))}<span>Havarie-Assistent Gefahrstoffe</span></div>
         ${step !== 'start' ? html`<button class="btn btn--sm btn--quiet" type="button" data-act="go" data-to="start">${U.ico('home')}Start</button>` : ''}
       </header>
-      ${meta.example_data ? html`<div class="banner" role="note">${U.ico('warn')}<div><b>${meta.banner}</b><br>Regeln, Stoffe und Standorte sind Beispiele und fachlich nicht freigegeben. Das Ergebnis ist nicht verbindlich.</div></div>` : ''}
       ${(meta.warnings && meta.warnings.length) ? html`<div class="banner banner--stop" role="alert">${U.ico('warn')}<div><b>Daten prüfen</b>${meta.warnings.map(w => html`<br>${w}`)}</div></div>` : ''}
       `;
   }
@@ -288,7 +287,7 @@
     return html`
       <div class="dock__top">
         <div class="dock__identity"><span class="dock__dot" aria-hidden="true"></span><strong>${label}</strong><span class="dock__step">${step === 'start' ? 'Start' : step === 'ergebnis' ? 'Ergebnis' : 'Station ' + num + '/' + STATIONS.length}</span></div>
-        <span class="dock__safety" title="Beispieldaten, keine fachliche Freigabe">Demo · nicht freigegeben</span>
+        <span class="dock__safety" title="Fachliche Freigabe nur nach dokumentiertem Prüf- und Freigabeprozess">Freigabe: ausstehend</span>
       </div>
       <div class="dock__bottom">
         <div class="dock__progress" role="progressbar" aria-label="Durchlaufene Stationen" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
