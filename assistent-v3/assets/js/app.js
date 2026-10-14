@@ -11,7 +11,7 @@
   const { html, raw } = U;
 
   const PLACEHOLDER = 'STANDORTBEZOGEN ZU ERGAENZEN';
-  const KEY = 'havarie.pages.v1';
+  const KEY = 'havarie.v3.pilot.singlecase.v1';
   const STEPS = ['start', 'ort', 'umgebung', 'stoff', 'taetigkeit', 'ausruestung', 'pruefen', 'ergebnis'];
   const STATIONS = C.stations;
 
@@ -281,12 +281,12 @@
   function statusHtml() {
     const step = S.step, idx = STATIONS.findIndex(s => s.id === step);
     const num = idx >= 0 ? idx + 1 : step === 'ergebnis' ? STATIONS.length : 0;
-    const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : step === 'notfall' ? 'Notfallplan' : STATIONS[idx].label;
-    const pct = step === 'notfall' ? 0 : Math.round(num * 100 / STATIONS.length);
+    const label = step === 'start' ? 'Vorbereitung' : step === 'ergebnis' ? 'Vorab-Ergebnis' : step === 'notfall' ? 'Notfallplan' : step === 'arbeitsstand' ? 'Arbeitsstand' : STATIONS[idx].label;
+    const pct = (step === 'notfall' || step === 'arbeitsstand') ? 0 : Math.round(num * 100 / STATIONS.length);
     const done = id => A.missing(id).length === 0 && (STATIONS.findIndex(st => st.id === id) < (idx < 0 ? (step === 'ergebnis' ? 99 : 0) : idx));
     return html`
       <div class="dock__top">
-        <div class="dock__identity"><span class="dock__dot" aria-hidden="true"></span><strong>${label}</strong><span class="dock__step">${step === 'start' ? 'Start' : step === 'ergebnis' ? 'Ergebnis' : 'Station ' + num + '/' + STATIONS.length}</span></div>
+        <div class="dock__identity"><span class="dock__dot" aria-hidden="true"></span><strong>${label}</strong><span class="dock__step">${step === 'start' ? 'Start' : step === 'arbeitsstand' ? 'V3 · Demo' : step === 'ergebnis' ? 'Ergebnis' : 'Station ' + num + '/' + STATIONS.length}</span></div>
         <span class="dock__safety" title="Fachliche Freigabe nur nach dokumentiertem Prüf- und Freigabeprozess">Freigabe: ausstehend</span>
       </div>
       <div class="dock__bottom">
