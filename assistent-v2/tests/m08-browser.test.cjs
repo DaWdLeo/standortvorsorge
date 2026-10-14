@@ -21,7 +21,7 @@ async function openPage(width,height=850,relative=''){
  page.on('pageerror',e=>errors.push(String(e)));
  const r=await page.goto(BASE+relative,{waitUntil:'load'});
  assert.equal(r.status(),200);
- await page.locator('#stage [data-heading]').first().waitFor({timeout:12000});
+ if(!relative.includes('embed-demo.html')) await page.locator('#stage [data-heading]').first().waitFor({timeout:12000});
  return {page,context,errors};
 }
 function checkErrors(errors,area){assert.deepEqual(errors,[],area+': No unhandled JavaScript exceptions');}
