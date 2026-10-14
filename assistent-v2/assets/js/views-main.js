@@ -186,7 +186,7 @@
     const units = DATA.lists.units.map(u => ({ id: u, label: (C.unitChoices.find(x => x.value === u) || {}).label || u, checked: S.d.unit === u }));
     const amount = A.q('taetigkeit', 'amount', 'Wie viel kommt zum Einsatz?', 'Menge, die gleichzeitig am Einsatzort bereitsteht oder verarbeitet wird.', html`
       <div class="field" style="max-width:260px"><label for="f-amount">Menge</label><input id="f-amount" type="number" inputmode="decimal" min="0" step="any" value="${S.d.amount}" data-live="d.amount"></div>`, 'menge');
-    const unit = A.q('taetigkeit', 'unit', 'In welcher Einheit?', '', U.chipGroup({ type: 'radio', name: 'unit', bind: 'd.unit', items: units }));
+    const unit = A.q('taetigkeit', 'unit', 'In welcher Einheit?', 'Wählen Sie die zur angegebenen Menge passende Einheit.', html`<div class="unit-picker">${U.chipGroup({ type: 'radio', name: 'unit', bind: 'd.unit', items: units })}</div>`);
     const qc = A.q('taetigkeit', 'quantityClass', C.questions.quantityClass.title, C.questions.quantityClass.help,
       U.choiceGroup({ name: 'quantityClass', bind: 'd.quantityClass', value: S.d.quantityClass, text: true, options: optionsFor('quantityClass', 'quantity_classes'), label: 'Mengenklasse' }));
     const cont = A.q('taetigkeit', 'container', 'In welchem Gebinde?', 'Das größte Gebinde bestimmt, wie viel auf einmal auslaufen kann.',
