@@ -76,3 +76,8 @@ input,select,textarea,button{max-width:100%}
     padding:6px max(6px,env(safe-area-inset-right)) 7px max(6px,env(safe-area-inset-left));
   }
 }
+
+/* Low-key pilot label in the sidebar; no prominent warning tile. */
+.industrial-side-note{display:flex;align-items:flex-start;flex-wrap:wrap;gap:8px;line-height:1.45}
+.industrial-pilot-badge{display:inline-flex;align-items:center;padding:3px 8px;border:1px solid #668899;border-radius:7px;letter-spacing:.09em;font-size:11px;font-weight:800;color:#e3eff4;background:#244656}
+.status-dock .dock__safety{color:var(--ink-2);background:var(--paper);border-color:var(--line);font-weight:650}
