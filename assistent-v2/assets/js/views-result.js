@@ -122,6 +122,14 @@
         </dl>
       </section>
       <section class="report-section"><h2>02 · Erfasste Angaben</h2><dl class="report-grid">${items.map(x => field(x[0],x[1]))}</dl></section>
+      <section class="report-section"><h2>02a · Standortunterlagen und offene Kontextprüfung</h2>
+        <p>Die folgenden Zusatzangaben wurden nicht fachlich geprüft und nicht für Regelentscheidungen ausgewertet.</p>
+        <dl class="report-grid">
+          ${[['Ort-ID', 'locationId'], ['BE-/Lageplan-ID','bePlanId'], ['Planrevision','bePlanRevision'], ['Ableitungsziel','drainageDestination'], ['Schutzgebietsbezug','protectionArea'], ['Überschwemmungsbezug','floodArea'], ['Altlastenstatus','contamination'], ['Grundwasser/Erlaubnis','groundwater'], ['Notfallausrüstung am Standort','equipmentLocation'], ['Vertretende Funktion','deputyRole']].map(([label,key]) => field(label,(d.siteDocs||{})[key]))}
+        </dl>
+        <p><strong>Zu prüfende Szenarien (unbestätigt):</strong> ${(d.siteDocs?.scenarioReview||[]).map(id => (DATA.scenarios.find(sc=>sc.Szenario_ID===id)||{}).Bezeichnung).filter(Boolean).join(', ') || 'Keine ausgewählt'}</p>
+        <p><strong>Dokumentationsstand:</strong> ${A.siteDocsStatus().done}/${A.siteDocsStatus().total} Referenzangaben vorhanden, ohne Quellen-/Freigabeprüfung.</p>
+      </section>
       <section class="report-section"><h2>03 · Vorab-Prüfergebnis</h2>
         <div class="report-status"><strong>${C.verdicts[verdict.key].title}</strong><p>${C.verdicts[verdict.key].text}</p>
           <p>Pflichtangaben: ${res.pflicht.progress} von ${res.pflicht.total} · Regeltreffer: ${res.rule_hits} · Sperren: ${res.blocks} · Offene Maßnahmen: ${res.open_count}</p></div>

@@ -141,7 +141,23 @@
       <div class="field"><label for="f-end">Ende</label><input id="f-end" type="date" value="${d.end}" data-live="d.end"></div></div>`);
     const who = A.q('ort', 'ersteller', 'Wer macht die Angaben?', 'Der Name erscheint auf der Ergebnisseite und bleibt auf diesem Gerät.', html`
       <div class="field"><label for="f-creator">Name</label><input id="f-creator" type="text" maxlength="120" autocomplete="name" value="${d.creator}" data-live="d.creator"></div>`, 'vorab');
-    return A.tafel('ort', html`${proj1}${local}${loc}${zeit}${who}`);
+    const sd = d.siteDocs || {}, sf = (id, label, hint) => html`<div class="field"><label for="sd-${id}">${label}</label><input id="sd-${id}" type="text" maxlength="160" autocomplete="off" value="${sd[id] || ''}" data-live="d.siteDocs.${id}" placeholder="${hint || 'STANDORTBEZOGEN ZU ERGAENZEN'}"></div>`;
+    const context = html`<details class="more p2-documentation"><summary>Standortunterlagen und Umweltkontext <small>(Entwurfsangaben · ${A.siteDocsStatus().done}/${A.siteDocsStatus().total})</small></summary>
+      <div class="p2-grid">
+        ${sf('locationId','Ort-ID / BE-Plan-Kennung')}
+        ${sf('bePlanId','BE-/Lageplan – Dokument-ID')}
+        ${sf('bePlanRevision','Planrevision / Planstand')}
+        ${sf('drainageDestination','Ableitungsziel / Entwässerung')}
+        ${sf('protectionArea','Wasserschutz-/Schutzgebiet (Status/Beleg)')}
+        ${sf('floodArea','Überschwemmungsgebiet (Status/Beleg)')}
+        ${sf('contamination','Altlasten (Status/Beleg)')}
+        ${sf('groundwater','Grundwasserhaltung / Erlaubnisreferenz')}
+        ${sf('equipmentLocation','Standort der Notfallausrüstung')}
+        ${sf('deputyRole','Vertretende Funktion')}
+      </div>
+      <p class="hint">Diese Angaben sind unbestätigte Dokumentationshinweise. Sie verändern weder die Regelbewertung noch den fachlichen Freigabestatus. Keine echte Projektinformation in der öffentlichen Demo eingeben.</p>
+    </details>`;
+    return A.tafel('ort', html`${proj1}${local}${loc}${zeit}${who}${context}`);
   };
   A.binders.project = function (el) {
     const id = el.value;
@@ -164,13 +180,25 @@
     const barriers = A.q('umgebung', 'barriers', 'Welche Schutzbarrieren stehen vor Ort?', 'Mehrere sind möglich. Nur auswählen, was schon steht.', html`
       ${U.chipGroup({ type: 'checkbox', name: 'barrier', bind: '@barrier', items: C.barrierChips.map(b => ({ id: b.id, label: b.label, checked: S.d.barriers.includes(b.id) })).concat([{ id: 'keine', label: 'Keine', checked: S.d.barriers.includes('keine') }]) })}
       <div class="field" style="margin-top:10px"><label for="f-bother">Weitere Schutzbarriere (optional)</label><input id="f-bother" type="text" maxlength="120" autocomplete="off" value="${S.d.barrierOther}" data-live="d.barrierOther"></div>`, 'barrieren');
+    const sd = S.d.siteDocs || {};
+    const scenarioContext = html`<details class="more p2-documentation"><summary>Umweltnotfallszenarien dokumentieren <small>(Mehrfachauswahl, keine automatische Bewertung)</small></summary>
+      <div class="chips p2-scenarios" role="group" aria-label="Fachlich noch zu prüfende Szenarien">
+        ${DATA.scenarios.map(sc => html`<label class="chipbtn"><input type="checkbox" data-bind="@siteScenario" value="${sc.Szenario_ID}" ${(sd.scenarioReview || []).includes(sc.Szenario_ID) ? raw('checked') : ''}><span>${sc.Bezeichnung}</span></label>`)}
+      </div>
+      <p class="hint">Erfassung eines möglichen Prüfbedarfs. Hierdurch werden keine Szenarien als zutreffend bestätigt und keine Maßnahmen ausgelöst.</p>
+    </details>`;
     return A.tafel('umgebung', html`
       ${choiceQ('umgebung', 'ground', 'ground', 'd.ground')}
       ${choiceQ('umgebung', 'drainage', 'drainage', 'd.drainage', dh)}
       ${choiceQ('umgebung', 'water', 'water', 'd.water')}
       ${choiceQ('umgebung', 'excavation', 'excavation', 'd.excavation')}
       ${choiceQ('umgebung', 'retention', 'retention', 'd.retention', rh)}
-      ${barriers}`);
+      ${barriers}${scenarioContext}`);
+  };
+  A.binders.siteScenario = el => {
+    const d = S.d.siteDocs, ids = new Set(d.scenarioReview || []);
+    if (el.checked) ids.add(el.value); else ids.delete(el.value);
+    d.scenarioReview = [...ids]; A.save(); A.render();
   };
   A.binders.barrier = function (el) {
     const id = el.value, set = new Set(S.d.barriers);
