@@ -130,7 +130,7 @@
         ${reasonsList.length ? html`<ol class="report-list">${reasonsList.map(x=>html`<li><strong>${x.title}</strong>${x.text ? html` – ${x.text}` : ''}${x.meta ? html` (${x.meta})` : ''}</li>`)}</ol>` : html`<p>Keine offenen Punkte aus dieser Vorabauswertung. Dies ist keine fachliche Freigabe.</p>`}
       </section>
       <section class="report-section"><h2>05 · Maßnahmenstatus</h2>
-        ${res.derived_measures.length ? res.derived_measures.map(x=>html`<div class="report-item"><strong>${x.Titel}</strong><p>${x.Freigegebener_Text}</p><p>Regel: ${x.Ausloesende_Regel_ID} · Quelle: ${x.Quelle_ID}</p></div>`) : html`<p>Keine operativ anzeigbare Maßnahme vorhanden.</p>`}
+        ${!DATA.meta.example_data && res.derived_measures.length ? res.derived_measures.map(x=>html`<div class="report-item"><strong>${x.Titel}</strong><p>${x.Freigegebener_Text}</p><p>Regel: ${x.Ausloesende_Regel_ID} · Quelle: ${x.Quelle_ID}</p></div>`) : html`<p>Keine fachlich verifizierte operative Maßnahme für diesen Demonstrator vorhanden.</p>`}
         ${res.excluded_measures.length ? html`<p><strong>${res.excluded_measures.length} Maßnahmen nicht anzeigbar.</strong> Fachliche Voraussetzungen oder Ausrüstung prüfen.</p>` : ''}
       </section>
       <section class="report-section"><h2>06 · Prüfschritt / weitere Bearbeitung</h2>
@@ -194,8 +194,8 @@
       </section>
 
       <section class="card" aria-labelledby="h-meas"><h3 id="h-meas">Maßnahmen für diesen Einsatz</h3>
-        ${res.derived_measures.length ? html`<p class="muted">Nur Maßnahmen, die fachlich freigegeben sind und deren Ausrüstung da und geeignet ist.</p>${res.derived_measures.map(measureCard)}`
-        : html`<p>Es gibt keine Maßnahme, die jetzt angezeigt werden darf. Das liegt an offenen Punkten oder fehlender Freigabe der Maßnahmen.</p>`}
+        ${!DATA.meta.example_data && res.derived_measures.length ? html`<p class="muted">Nur Maßnahmen, die fachlich freigegeben sind und deren Ausrüstung da und geeignet ist.</p>${res.derived_measures.map(measureCard)}`
+        : html`<p>Keine fachlich verifizierten operativen Maßnahmen für diese öffentliche Demonstration verfügbar. Nutzen Sie ausschließlich betrieblich freigegebene Unterlagen.</p>`}
         ${res.excluded_measures.length ? html`<details class="more"><summary>Nicht anzeigbare Maßnahmen (${res.excluded_measures.length})</summary>${res.excluded_measures.map(x => html`<div class="measure measure--no"><h4>${x.Titel || x.Massnahme_ID}</h4><p class="muted small">Regel ${x.Regel_ID}${String(x.Pflichtmassnahme).toLowerCase() === 'ja' ? ', Pflichtmaßnahme' : ''}</p><p>${x.Grund}</p></div>`)}</details>` : ''}
       </section>
 
