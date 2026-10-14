@@ -49,3 +49,46 @@
 @media(max-width:720px){.workstand-metrics{grid-template-columns:1fr 1fr 1fr;gap:6px}.workstand-metric{padding:11px 9px}.workstand-metric p{font-size:.7rem}.workstand-row{grid-template-columns:1fr 1fr;gap:8px}.workstand-row__name{grid-column:1/-1}.workstand-row__chevron{display:none}.workstand-row__status{gap:1px}.workstand-detail__body{grid-template-columns:1fr}.workstand-next{border-left:0;border-top:1px solid var(--line-soft);padding:17px 0 0}}
 @media(max-width:460px){.workstand-metrics{grid-template-columns:1fr}.workstand-metric p{min-height:0;margin-bottom:8px}.workstand-head{flex-wrap:wrap}.workstand-detail__head{padding:13px;flex-wrap:wrap}.workstand-detail__body{padding:14px}.workstand-row{padding:12px 8px}.industrial-bottom-item{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.workstand *{transition:none!important}}
+
+/* Phase 1b: status cards instead of dense table; use text and symbols alongside color */
+.workstand-toolbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:15px}
+.workstand-filters{display:flex;flex-wrap:wrap;gap:7px}
+.workstand-filters button{border:1px solid var(--line);background:var(--paper);color:var(--ink-2);border-radius:9px;min-height:43px;padding:9px 13px;cursor:pointer;font-size:.87rem}
+.workstand-filters button.is-active,.workstand-filters button[aria-pressed=true]{background:var(--info-bg);color:var(--info-ink);border-color:var(--info);font-weight:700}
+.workstand-sort{display:flex;align-items:center;gap:8px;color:var(--ink-2);font-size:.84rem}
+.workstand-sort select{min-height:43px;border:1px solid var(--line);border-radius:9px;background:var(--paper);padding:8px;color:var(--ink)}
+.workstand-metric--button{cursor:pointer;text-align:left;color:var(--ink);width:100%;transition:background .15s,border-color .15s}
+.workstand-metric--button:hover,.workstand-metric--button.is-active{border-color:var(--info);background:var(--info-bg)}
+.workstand-metric--button:focus-visible,.workstand-case:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.workstand-cardgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:0 0 22px}
+.workstand-case{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:18px 17px;display:flex;flex-direction:column;gap:13px;text-align:left;min-width:0;color:var(--ink);cursor:pointer;box-shadow:0 3px 12px #00000008}
+.workstand-case.is-selected{outline:2px solid var(--info);outline-offset:1px}
+.workstand-case:hover{background:var(--info-bg)}
+.workstand-case--needs{border-left-color:var(--warn)}
+.workstand-case--review{border-left-color:var(--info)}
+.workstand-case--approved{border-left-color:var(--ok);background:color-mix(in srgb,var(--ok-bg) 21%,var(--paper))}
+.workstand-case__top{display:flex;justify-content:space-between;align-items:flex-start;gap:9px;font-size:.75rem;color:var(--ink-2)}
+.workstand-case__top>span:first-child{min-width:0;overflow-wrap:anywhere}
+.workstand-case__badge{border:1px solid currentColor;padding:4px 7px;border-radius:99px;flex:none;font-size:.73rem;font-weight:700;max-width:48%;overflow-wrap:anywhere}
+.workstand-case--needs .workstand-case__badge{color:var(--warn-ink);background:var(--warn-bg)}
+.workstand-case--review .workstand-case__badge{color:var(--info-ink);background:var(--info-bg)}
+.workstand-case--approved .workstand-case__badge{color:var(--ok-ink);background:var(--ok-bg)}
+.workstand-case__title{font-size:1.14rem;line-height:1.25;font-weight:720}
+.workstand-case__statuses{display:flex;flex-wrap:wrap;gap:7px;font-size:.73rem;color:var(--ink-2)}
+.workstand-case__statuses span{padding:6px 7px;border-radius:7px;background:var(--concrete)}
+.workstand-case__task{display:grid;gap:3px;border-top:1px solid var(--line-soft);padding-top:12px}
+.workstand-case__task small:first-child{font-size:.67rem;letter-spacing:.08em;color:var(--ink-2);font-weight:700}
+.workstand-case__task strong{font-size:.93rem;line-height:1.36;font-weight:680}
+.workstand-case__task small:last-child{font-size:.76rem;color:var(--ink-2)}
+.workstand-case__open{font-size:.78rem;color:var(--info-ink);font-weight:700}
+.workstand-empty{grid-column:1/-1;padding:18px;border:1px dashed var(--line);border-radius:12px}
+.workstand-empty button{min-height:40px;padding:7px 10px;border:1px solid var(--info);border-radius:8px;color:var(--info-ink);background:var(--info-bg)}
+.workstand-history{margin:0 20px 18px;border-top:1px solid var(--line-soft);padding:12px 0}
+.workstand-history summary{font-size:.87rem;font-weight:680;cursor:pointer;min-height:45px;display:flex;align-items:center}
+.workstand-history ol{margin:4px 0;padding-left:25px;font-size:.81rem}
+.workstand-history p{font-size:.78rem;color:var(--ink-2)}
+.workstand-scope{background:var(--paper);padding:16px;border:1px solid var(--line);border-radius:11px}
+.workstand-metric p{min-height:0}
+@media(max-width:1000px){.workstand-cardgrid{grid-template-columns:1fr}}
+@media(max-width:580px){.workstand-cardgrid{grid-template-columns:1fr}.workstand-toolbar{align-items:stretch}.workstand-sort{width:100%}.workstand-sort select{flex:1}.workstand-case{padding:15px}.workstand-case__top{flex-wrap:wrap}.workstand-case__badge{max-width:100%}.workstand-scope{flex-direction:column;align-items:flex-start}.workstand-history{margin:0 14px 14px}}
+@media(prefers-reduced-motion:reduce){.workstand-metric--button{transition:none}}
