@@ -3,7 +3,7 @@
 'use strict';
 const A=window.HavarieApp,U=window.HavarieUI;
 const {html,raw}=U;
-const areaFor={start:'start',ort:'ort',umgebung:'ort',stoff:'stoff',taetigkeit:'stoff',ausruestung:'ausruestung',pruefen:'ausruestung',ergebnis:'ausruestung',notfall:'notfall'};
+const areaFor={start:'start',arbeitsstand:'arbeitsstand',ort:'ort',umgebung:'ort',stoff:'stoff',taetigkeit:'stoff',ausruestung:'ausruestung',pruefen:'ausruestung',ergebnis:'ausruestung',notfall:'notfall'};
 const titles={start:'Übersicht',ort:'Standort',stoff:'Gefahrstoffe',ausruestung:'Vorsorge',notfall:'Notfallplan'};
 const keepGo=A.go;
 A.go=function(step,opts){if(step==='notfall'){A.S.step='notfall';A.S.navOpen=false;try{history.pushState({step},'','#notfall')}catch{}A.save();A.render({focusHeading:true});A.scrollTop();return}keepGo(step,opts)};
