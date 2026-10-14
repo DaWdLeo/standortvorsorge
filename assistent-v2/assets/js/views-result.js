@@ -202,7 +202,7 @@
       <section class="card" aria-labelledby="h-report"><h3 id="h-report">Meldung und Eskalation prüfen</h3>${reportCards(res)}${U.learnCard('meldung', { open: S.open, data: DATA })}</section>
 
       <section class="card" aria-labelledby="h-emerg"><h3 id="h-emerg">Wenn etwas ausläuft</h3>
-        <ol class="ordered">${DATA.event.general_actions.map(x => html`<li>${x.replace(/^\d+\.\s*/, '')}</li>`)}</ol>
+        ${DATA.meta.example_data ? html`<p>In dieser öffentlichen Demonstration stehen keine geprüften standort- und stoffspezifischen Notfallanweisungen zur Verfügung. Nutzen Sie die freigegebenen betrieblichen Notfallunterlagen.</p>` : html`<ol class="ordered">${DATA.event.general_actions.map(x => html`<li>${x.replace(/^\d+\.\s*/, '')}</li>`)}</ol>`}
         <p class="learn__remember" style="margin-top:10px">Bei Gefahr für Menschen zuerst den Notruf 112 wählen.</p></section>
 
       <section class="card"><details class="more"><summary>Technische Details</summary>
