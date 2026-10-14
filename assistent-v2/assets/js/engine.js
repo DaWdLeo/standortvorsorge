@@ -32,6 +32,28 @@
   const GROUP_B = 'B - Szenario-/stoffbezogen';
   const PLACEHOLDER = 'STANDORTBEZOGEN ZU ERGAENZEN';
 
+  // P1: validation shared by the public UI and the rules engine.
+  // Unknown values and invalid quantities are never treated as evidence of completeness.
+  // No implicit mass/volume conversion and no hidden default unit.
+  function validateInput(data, draft) {
+    const d = draft || {}, lists = (data && data.lists) || {};
+    const issues = [];
+    function allowed(field, value, listName, label) {
+      const values = lists[listName];
+      if (!Array.isArray(values) || !values.some(v => str(v) === str(value))) {
+        issues.push({ field, message: label + ' fehlt oder ist nicht in der freigegebenen Werteliste enthalten.' });
+      }
+    }
+    const quantity = typeof d.amount === 'number' ? d.amount : Number(str(d.amount).trim().replace(',', '.'));
+    if (blank(d.amount) || !Number.isFinite(quantity) || quantity <= 0) {
+      issues.push({ field: 'amount', message: 'Die Menge muss eine endliche Zahl größer als 0 sein.' });
+    }
+    allowed('unit', d.unit, 'units', 'Einheit');
+    allowed('quantityClass', d.quantityClass, 'quantity_classes', 'Mengenklasse');
+    allowed('container', d.container, 'containers', 'Gebinde');
+    return { valid: issues.length === 0, issues };
+  }
+
   // ---------- 22_Einsatz_Ausruestung: Zeilenstatus (Q) und Sperre_aktiv (R) ----------
   function equipmentRow(row, einsatzId) {
     const id = str(row.equipment_id);
@@ -120,6 +142,7 @@
       amount: d.amount, unit: str(d.unit),                                   // F18, F19
       barriers: str(d.barriers),                                             // F21 (C53)
     };
+    const inputCheck = validateInput(data, d);
     const stoffName = stoff ? str(stoff.Produktname) : 'nicht identifiziert';     // G6
     const equipRows = (d.equipment || []).filter(e => !blank(e.equipment_id)).map(e => equipmentRow(e, opts.einsatzId));
 
@@ -226,7 +249,7 @@
     const complete = !blank(F.stoff) && !blank(F.activity) && !blank(F.ground) && !eq(F.ground, 'Unbekannt') &&
       !blank(F.drainage) && !eq(F.drainage, 'Unbekannt') && !blank(F.water) && !eq(F.water, 'Unbekannt') &&
       !blank(F.excavation) && !eq(F.excavation, 'Unbekannt') && !blank(F.retention) && !eq(F.retention, 'Unklar') && !eq(F.retention, 'Unbekannt') &&
-      !blank(F.project) && !blank(F.amount) && !blank(F.unit);                                     // C6
+      !blank(F.project) && !blank(F.amount) && !blank(F.unit) && inputCheck.valid;                // C6 + fail-safe P1 validation
     const sperrgruende = (blocks > 0 || openMeasures.filter(o => Number(o._row) <= 16).some(o => eq(o.Sperrwirkung, 'Ja') && o.Status === 'Offen')) ? 1 : 0; // C7 (33!F7:F16)
     const fachpruefung = (hitCount === 0 || conflict === 1 || contains(handlung, 'Fachpruefung') || gefahrgutSperre === 'Ja') ? 'Ja' : 'Nein'; // C9
     const manual = str(opts.manualDecision);                                                         // C12
@@ -242,9 +265,9 @@
     else effective = manual;
 
     // --- 30_Bewertung!C18 und 05_Ergebnis!C24 / F13 ---
-    const capability = blocks > 0 ? 'Nicht freigabefaehig (Sperre aktiv)'
+    let capability = blocks > 0 ? 'Nicht freigabefaehig (Sperre aktiv)'
       : hitCount === 0 ? 'Fachpruefung erforderlich (kein Regeltreffer)' : 'Freigabefaehig (vorbehaltlich Pruefung)';
-    const overall = blocks > 0 ? 'NICHT FREIGABEFAEHIG'
+    let overall = blocks > 0 ? 'NICHT FREIGABEFAEHIG'
       : hitCount === 0 ? 'FACHPRUEFUNG ERFORDERLICH'
         : openCount > 0 ? 'MASSNAHMENBEDARF VOR FREIGABE'
           : eq(effective, 'Freigegeben') ? 'EINSATZ FREIGEGEBEN' : 'EINSATZ FACHLICH FREIGABEFAEHIG';
@@ -263,7 +286,7 @@
     const prodName = stoff ? str(stoff.Produktname) : str(d.productName);
     const actName = activity ? str(activity.Bezeichnung) : str(d.activityName);
     const checks = [
-      { id: 'pflichtfelder', label: 'Pflichtfelder vollständig', ok: !!(pName && prodName && actName && !blank(d.amount) && !blank(d.location) && !blank(d.creator)) },
+      { id: 'pflichtfelder', label: 'Pflichtfelder vollständig', ok: !!(pName && prodName && actName && !blank(d.amount) && !blank(d.location) && !blank(d.creator) && inputCheck.valid) },
       { id: 'stoff', label: 'Stoff eindeutig identifiziert', ok: !blank(F.stoff) },
       { id: 'sdb', label: 'SDB vorhanden und bestätigt', ok: eq(F.sdb, 'Ja') },
       { id: 'projekt', label: 'Projektinformationen vollständig', ok: !!(pName && F.project) },
@@ -281,7 +304,13 @@
     if (eq(F.excavation, 'Unklar')) unclear.push('Baugrube');
     if (eq(F.retention, 'Unklar')) unclear.push('Rückhaltung');
     if (eq(F.ground, 'Unklar')) unclear.push('Untergrund');
-    const uiGuard = { active: opts.strictUnclear && unclear.length > 0, unclear };
+    const uiGuard = { active: (opts.strictUnclear && unclear.length > 0) || !inputCheck.valid, unclear, invalid_fields: inputCheck.issues };
+    if (!inputCheck.valid) {
+      effective = 'Unvollstaendig / ungueltige Menge oder Einheitenangaben';
+      capability = 'Nicht bewertbar (ungueltige Eingaben)';
+      overall = 'ANGABEN UNVOLLSTAENDIG';
+      action = '1. Menge, Einheit, Mengenklasse und Gebinde korrigieren.\\n2. Erfassung erneut pruefen.\\n3. Keine Freigabe aus dieser Vorabbewertung ableiten.';
+    }
 
     return {
       engine_version: '1.0',
@@ -301,9 +330,9 @@
       complete, sperrgruende_offen: sperrgruende, fachpruefung_erforderlich: fachpruefung,
       effective_status: effective, automatic_capability: capability, overall_status: overall, action,
       pflicht: { checks, progress, total: checks.length, complete: progress === checks.length },
-      ui_guard: uiGuard,
+      ui_guard: uiGuard, input_validation: inputCheck,
     };
   }
 
-  return { evaluate, equipmentRow, measureOperational, measureBlockReason };
+  return { evaluate, validateInput, equipmentRow, measureOperational, measureBlockReason };
 }));

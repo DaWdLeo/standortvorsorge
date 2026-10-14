@@ -218,10 +218,10 @@
       need('dangerousGoods', 'Bitte eine Antwort wählen.', !!d.dangerousGoods);
     } else if (step === 'taetigkeit') {
       need('activityId', 'Bitte eine Tätigkeit wählen.', !!d.activityId);
-      need('amount', 'Bitte die Menge angeben (größer als 0).', Number(String(d.amount).replace(',', '.')) > 0);
-      need('unit', 'Bitte eine Einheit wählen.', !!d.unit);
-      need('quantityClass', 'Bitte eine Mengenklasse wählen.', !!d.quantityClass);
-      need('container', 'Bitte das Gebinde wählen.', !!d.container);
+      need('amount', 'Bitte eine gültige positive Menge angeben.', E.validateInput(A.dataEff(), A.buildDraft(false)).issues.every(x => x.field !== 'amount'));
+      need('unit', 'Bitte eine gültige Einheit wählen.', E.validateInput(A.dataEff(), A.buildDraft(false)).issues.every(x => x.field !== 'unit'));
+      need('quantityClass', 'Bitte eine gültige Mengenklasse wählen.', E.validateInput(A.dataEff(), A.buildDraft(false)).issues.every(x => x.field !== 'quantityClass'));
+      need('container', 'Bitte ein gültiges Gebinde wählen.', E.validateInput(A.dataEff(), A.buildDraft(false)).issues.every(x => x.field !== 'container'));
     } else if (step === 'ausruestung') {
       A.neededEquipment().forEach((n, id) => {
         const e = d.equip[id];
