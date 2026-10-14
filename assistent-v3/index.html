@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Havarie-Assistent V3 · Arbeitsstand (Pilot)</title>
+<meta name="description" content="Gefahrstoff-Check vor dem Einsatz auf der Baustelle: Fragen beantworten, Vorab-Ergebnis erhalten. Beispieldaten, keine Freigabe.">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' file:; style-src 'self' file: 'unsafe-inline'; img-src 'self' file: data:; connect-src 'self' file:; base-uri 'none'; form-action 'none'">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8L95 88H5Z' fill='%23FFC500' stroke='%231B1F23' stroke-width='6' stroke-linejoin='round'/%3E%3Crect x='46' y='38' width='8' height='21' rx='3' fill='%231B1F23'/%3E%3Ccircle cx='50' cy='68' r='4.6' fill='%231B1F23'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/app.css">
+<link rel="stylesheet" href="assets/css/industrial.css?v=premium-20261014">
+<link rel="stylesheet" href="assets/css/report.css">
+<link rel="stylesheet" href="assets/css/workstand.css?v=20261014-v3a">
+</head>
+<body>
+<div id="app" class="app">
+  <aside class="industrial-sidebar" aria-label="Hauptnavigation">
+    <div class="industrial-logo"><span class="industrial-logo__mark">◈</span><span><strong>Havarie-Assistent</strong><small>Umweltvorsorge · D2</small></span></div>
+    <p class="industrial-nav-caption">ARBEITSBEREICHE</p>
+    <nav class="industrial-side-nav" aria-label="Hauptbereiche">
+      <button type="button" class="industrial-nav-item" data-act="go" data-to="start" aria-label="Übersicht"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-7h6v7"/></svg><span>Übersicht</span></button>
+      <button type="button" class="industrial-nav-item" data-act="go" data-to="arbeitsstand" aria-label="Arbeitsstand"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5M8 16h8"/></svg><span>Arbeitsstand</span></button>
+<button type="button" class="industrial-nav-item" data-act="go" data-to="ort" aria-label="Standort"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Standort</span></button>
+<button type="button" class="industrial-nav-item" data-act="go" data-to="stoff" aria-label="Gefahrstoffe"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M9 3h6M10 3v7l-5 8a3 3 0 0 0 2.6 4h8.8a3 3 0 0 0 2.6-4l-5-8V3"/><path d="M7 16h10"/></svg><span>Gefahrstoffe</span></button>
+<button type="button" class="industrial-nav-item" data-act="go" data-to="ausruestung" aria-label="Vorsorge"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M12 22c7-3 9-7 9-14l-9-5-9 5c0 7 2 11 9 14Z"/><path d="m9 12 2 2 4-4"/></svg><span>Vorsorge</span></button>
+<button type="button" class="industrial-nav-item" data-act="go" data-to="notfall" aria-label="Notfallplan"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5"/><path d="M12 18h.01"/></svg><span>Notfallplan</span></button>
+    </nav>
+    <div class="industrial-side-bottom">
+      <button type="button" class="industrial-theme" data-act="theme-toggle" aria-label="Darstellung zwischen Hell und Dunkel wechseln">◐ <span>Darstellung wechseln</span></button>
+      <div class="industrial-side-note" role="status"><span class="industrial-pilot-badge">PILOT</span><span>Erprobungsfassung mit Beispieldaten.<br>Fachliche Freigabe ausstehend.</span></div>
+    </div>
+  </aside>
+  <div class="industrial-workspace">
+    <div id="chrome"></div>
+    <div id="status-dock" class="status-dock" role="region" aria-label="Ständiger Status und Stationsnavigation"></div>
+    <main id="stage"><noscript><div class="noscript"><h2>JavaScript ist aus</h2><p>Der Havarie-Assistent läuft im Browser und braucht JavaScript. Bitte aktivieren Sie es und laden Sie die Seite neu.</p></div></noscript></main>
+  <div id="live" class="vh" aria-live="polite"></div>
+  </div>
+  <nav class="industrial-bottom-nav" aria-label="Mobile Hauptnavigation">
+    <button type="button" class="industrial-bottom-item" data-act="go" data-to="start" aria-label="Übersicht"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="m3 10 9-7 9 7"/><path d="M5 9v12h14V9"/><path d="M9 21v-7h6v7"/></svg><span>Übersicht</span></button>
+      <button type="button" class="industrial-bottom-item" data-act="go" data-to="arbeitsstand" aria-label="Arbeitsstand"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h5M8 16h8"/></svg><span>Arbeitsstand</span></button>
+<button type="button" class="industrial-bottom-item" data-act="go" data-to="ort" aria-label="Standort"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg><span>Standort</span></button>
+<button type="button" class="industrial-bottom-item" data-act="go" data-to="stoff" aria-label="Gefahrstoffe"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M9 3h6M10 3v7l-5 8a3 3 0 0 0 2.6 4h8.8a3 3 0 0 0 2.6-4l-5-8V3"/><path d="M7 16h10"/></svg><span>Gefahrstoffe</span></button>
+<button type="button" class="industrial-bottom-item" data-act="go" data-to="ausruestung" aria-label="Vorsorge"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="M12 22c7-3 9-7 9-14l-9-5-9 5c0 7 2 11 9 14Z"/><path d="m9 12 2 2 4-4"/></svg><span>Vorsorge</span></button>
+<button type="button" class="industrial-bottom-item" data-act="go" data-to="notfall" aria-label="Notfallplan"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"><path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5"/><path d="M12 18h.01"/></svg><span>Notfallplan</span></button>
+  </nav>
+</div>
+<script src="data/regelwerk.js"></script>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/engine.js"></script>
+<script src="assets/js/content.js"></script>
+<script src="assets/js/zip.js"></script>
+<script src="assets/js/kataster.js"></script>
+<script src="assets/js/ui.js"></script>
+<script src="assets/js/app.js"></script>
+<script src="assets/js/views-main.js"></script>
+<script src="assets/js/views-stoff.js"></script>
+<script src="assets/js/views-result.js"></script>
+<script src="assets/js/industrial.js?v=premium-20261014"></script>
+<script src="assets/js/workstand.js?v=20261014-v3a"></script>
+<script src="assets/js/report-audit.js"></script>
+<script src="assets/js/report-controls.js"></script>
+<script src="assets/js/boot.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+﻿Produktname;Hersteller;Kataster-Nr;CAS;GHS;Signalwort;WGK;Aggregatzustand;SDB-Datum;Lagerort
+Diesel (Kraftstoff);Hersteller C (Beispiel);KAT-2201;68334-30-5;GHS02, GHS07, GHS08, GHS09;Gefahr;WGK 2;flüssig;2025-01-15;Tankplatz
+Hydrauliköl HLP 46;Hersteller D (Beispiel);KAT-2214;;;;WGK 1;flüssig;2024-11-02;Werkstatt
+Betonzusatzmittel Typ FM;Hersteller E (Beispiel);KAT-2260;;GHS05;Gefahr;WGK 1;flüssig;2025-03-10;Container
+Schalöl Spezial (Beispiel);Hersteller F (Beispiel);KAT-3101;;GHS07, GHS09;Achtung;WGK 2;flüssig;2025-05-20;Lagerfläche
+Kaltreiniger Typ K (Beispiel);Hersteller G (Beispiel);KAT-3102;;GHS02, GHS07;Gefahr;WGK 2;flüssig;2025-06-01;Werkstatt
+Acetylen (Beispiel);Hersteller H (Beispiel);KAT-3103;74-86-2;GHS02, GHS04;Gefahr;WGK nwg;gasförmig;2024-09-12;Depot
