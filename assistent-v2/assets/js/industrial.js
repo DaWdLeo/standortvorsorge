@@ -35,43 +35,60 @@ function emergencyInformation(){
  <div class="actions"><button type="button" class="btn" data-act="go" data-to="start">Zur Übersicht</button><button type="button" class="btn btn--quiet" data-act="go" data-to="ort">Standortdaten ansehen</button></div>`;
 }
 A.views.notfall=emergencyInformation;
-const oldStart=A.views.start;
-A.views.start=()=> {
- const d=A.S.d,project=A.project();
- const all=['ort','umgebung','stoff','taetigkeit','ausruestung'];
- const missing=all.reduce((n,k)=>n+A.missing(k).length,0);
- const collected=all.length-all.filter(k=>A.missing(k).length).length;
+
+/* Dashboard figures originate from existing validation, not inferred safety approvals. */
+const WORKFLOW=['ort','umgebung','stoff','taetigkeit','ausruestung'];
+const iconPaths={
+ ort:'<path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/>',
+ stoff:'<path d="M9 3h6M10 3v7l-5 8a3 3 0 0 0 2.6 4h8.8a3 3 0 0 0 2.6-4l-5-8V3"/><path d="M7 16h10"/>',
+ ausruestung:'<path d="M12 22c7-3 9-7 9-14l-9-5-9 5c0 7 2 11 9 14Z"/><path d="m9 12 2 2 4-4"/>',
+ notfall:'<path d="m12 3 10 18H2L12 3Z"/><path d="M12 9v5"/><path d="M12 18h.01"/>'
+};
+const tile=(step,title,desc)=>html`
+ <button type="button" class="premium-area ${step==='notfall'?'premium-area--emergency':''}" data-act="go" data-to="${step}" aria-label="${title} öffnen">
+   <span class="premium-area__icon" aria-hidden="true">${raw('<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+iconPaths[step]+'</svg>')}</span>
+   <span class="premium-area__copy"><strong>${title}</strong><small>${desc}</small></span>
+   <span class="premium-area__arrow" aria-hidden="true">↗</span>
+ </button>`;
+A.views.start=()=>{
+ const project=A.project();
+ const done=WORKFLOW.filter(k=>A.missing(k).length===0).length;
+ const missing=WORKFLOW.reduce((total,k)=>total+A.missing(k).length,0);
+ const percent=Math.round(100*done/WORKFLOW.length);
  return html`
-  <section class="industrial-overview" aria-label="Arbeitsübersicht">
-   <article class="card wide"><p class="muted small">UMWELTVORSORGE · DEMONSTRATOR</p><h1 data-heading>Standortbezogen planen.</h1><p>Umweltrisiken erfassen, Schutzmaßnahmen vorbereiten und den Zugang zu Notfallinformationen organisieren.</p>
-    <div class="actions"><button type="button" class="btn btn--primary" data-act="go" data-to="ort">Standort bearbeiten →</button><button type="button" class="btn" data-act="go" data-to="notfall">Notfallinformationen</button></div>
-   </article>
-   <article class="card"><h2>Aktueller Standort</h2><p><strong>${project?.Projektbezeichnung||'Noch nicht gewählt'}</strong></p><p class="muted small">Angaben sind keine fachliche Prüfung.</p><button type="button" class="btn btn--sm" data-act="go" data-to="ort">Standortdaten</button></article>
-   <article class="card"><h2>Erfassungsstand</h2><p><strong>${collected} von ${all.length} Bereichen vollständig</strong></p><p class="muted">${missing} Pflichtangaben noch offen</p><button type="button" class="btn btn--sm" data-act="go" data-to="pruefen">Angaben prüfen</button></article>
-   <article class="card wide"><h2>Vorsorge und Notfallmanagement</h2><div class="industrial-phases">
-    <div class="industrial-phase"><strong>01 · Vorsorge</strong><p>Standort, Stoff und mögliche Ausbreitungswege erfassen.</p><button class="btn btn--sm" data-act="go" data-to="umgebung" type="button">Umgebung erfassen</button></div>
-    <div class="industrial-phase"><strong>02 · Bereitschaft</strong><p>Vorhandene Barrieren und Ausrüstung dokumentieren.</p><button class="btn btn--sm" data-act="go" data-to="ausruestung" type="button">Ausrüstung prüfen</button></div>
-    <div class="industrial-phase"><strong>03 · Ereignis</strong><p>Nur freigegebene Alarm- und Notfallunterlagen verwenden.</p><button class="btn btn--sm industrial-quick-emergency" data-act="go" data-to="notfall" type="button">Notfallplan öffnen</button></div>
-   </div></article>
-   <article class="card wide"><p><strong>Wichtig:</strong> Vollständige Datenerfassung ist weder fachliche Prüfung noch Einsatzfreigabe. Das exportierte Regelwerk enthält fachlich nicht freigegebene Beispieldaten.</p></article>
-  </section>${A.footer()}`;
+ <section class="premium-overview" aria-label="Arbeitsübersicht">
+   <header class="premium-page-head">
+     <p class="premium-eyebrow">UMWELTMANAGEMENT · BAUSTELLE</p>
+     <h1 data-heading tabindex="-1">Umweltvorsorge</h1>
+     <p>Standortbezogene Risiken erfassen und Schutzmaßnahmen vorbereiten.</p>
+   </header>
+   <section class="premium-context" aria-label="Standort und Erfassungsstand">
+     <div class="premium-context__grid">
+       <div><span class="premium-meta-label">AKTUELLER STANDORT</span><strong>${project?.Projektbezeichnung||'Nicht ausgewählt'}</strong></div>
+       <div><span class="premium-meta-label">DATENERFASSUNG</span><strong>${done} von ${WORKFLOW.length} Bereichen</strong></div>
+       <div><span class="premium-meta-label">OFFENE PFLICHTANGABEN</span><strong>${missing}</strong></div>
+     </div>
+     <div class="premium-progress" role="progressbar" aria-label="Vollständige Erfassungsbereiche" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent}"><span style="width:${percent}%"></span></div>
+     <div class="premium-context__actions">
+       <button class="btn btn--primary" type="button" data-act="go" data-to="ort">${project?'Standort bearbeiten':'Standort erfassen'}</button>
+       <button class="btn btn--quiet" type="button" data-act="go" data-to="pruefen">Angaben prüfen</button>
+     </div>
+   </section>
+   <div class="premium-section-heading"><h2>Arbeitsbereiche</h2><p>Direkt zum nächsten Arbeitsschritt.</p></div>
+   <nav class="premium-area-grid" aria-label="Arbeitsbereiche">
+     ${tile('ort','Standort','Umgebung und Schutzgüter')}
+     ${tile('stoff','Gefahrstoffe','Stoffe, Mengen und Tätigkeiten')}
+     ${tile('ausruestung','Vorsorge','Barrieren und Notfallausrüstung')}
+     ${tile('notfall','Notfallplan','Geprüfte Unterlagen abrufen')}
+   </nav>
+   <p class="premium-safety-note">Die Erfassung und die Vorabbewertung ersetzen keine fachliche Prüfung. Für diesen Demonstrator sind keine freigegebenen betrieblichen Notfallunterlagen hinterlegt.</p>
+ </section>${A.footer()}`;
 };
 const oldRender=A.render;
 A.render=function(opts){
  oldRender(opts);
  const active=areaFor[A.S.step]||'start';
  document.querySelectorAll('.industrial-nav-item,.industrial-bottom-item').forEach(b=>{if(b.dataset.to===active)b.setAttribute('aria-current','page');else b.removeAttribute('aria-current')});
- const dock=document.getElementById('status-dock');
- if(dock){
-  const wrap=dock.querySelector('.dock__top');
-  const project=A.project();
-  if(wrap){
-   const x=document.createElement('span');x.className='industrial-status-detail';x.textContent='Standort: '+(project?.Projektbezeichnung||'offen')+' · Fachprüfung: ausstehend';wrap.append(x);
-  }
-  if(A.S.step==='notfall'){
-   const head=dock.querySelector('.dock__identity strong');if(head)head.textContent='Notfallplan';
-   const prog=dock.querySelector('.dock__progress');if(prog)prog.setAttribute('aria-valuenow','0');
-  }
- }
+
 };
 })();
