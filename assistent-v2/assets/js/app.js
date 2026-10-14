@@ -26,6 +26,7 @@
     return {
       projectId: '', local: { name: '', contact: '' }, locChip: '', locText: '', creator: '', start: todayIso(), end: todayIso(),
       ground: '', drainage: '', water: '', excavation: '', retention: '', prefilled: {}, barriers: [], barrierOther: '',
+      siteDocs: { locationId: '', bePlanId: '', bePlanRevision: '', drainageDestination: '', protectionArea: '', floodArea: '', contamination: '', groundwater: '', equipmentLocation: '', deputyRole: '', scenarioReview: [] },
       substanceKey: '', sdbConfirmed: '', dangerousGoods: '', activityId: '', amount: '', unit: '', quantityClass: '', container: '', equip: {},
     };
   }
@@ -45,6 +46,14 @@
     ['projectId', 'locChip', 'locText', 'creator', 'start', 'end', 'ground', 'drainage', 'water', 'excavation', 'retention', 'barrierOther', 'substanceKey',
       'sdbConfirmed', 'dangerousGoods', 'activityId', 'amount', 'unit', 'quantityClass', 'container'].forEach(k => { if (typeof x[k] === 'string' || typeof x[k] === 'number') d[k] = str(String(x[k]), 200); });
     if (x.local && typeof x.local === 'object') { d.local.name = str(x.local.name, 120); d.local.contact = str(x.local.contact, 120); }
+    // Supplemental site documentation only; never changes Excel rule matches, statuses or operational instructions.
+    if (x.siteDocs && typeof x.siteDocs === 'object' && !Array.isArray(x.siteDocs)) {
+      for (const k of ['locationId','bePlanId','bePlanRevision','drainageDestination','protectionArea','floodArea','contamination','groundwater','equipmentLocation','deputyRole']) {
+        d.siteDocs[k] = str(x.siteDocs[k], 160);
+      }
+      const ids = new Set(DATA.scenarios.map(x => x.Szenario_ID));
+      d.siteDocs.scenarioReview = Array.isArray(x.siteDocs.scenarioReview) ? [...new Set(x.siteDocs.scenarioReview.filter(v => typeof v === 'string' && ids.has(v)))].slice(0,40) : [];
+    }
     if (Array.isArray(x.barriers)) d.barriers = x.barriers.filter(b => typeof b === 'string').slice(0, 12).map(b => b.slice(0, 40));
     if (x.prefilled && typeof x.prefilled === 'object') Object.keys(x.prefilled).forEach(k => { d.prefilled[k] = !!x.prefilled[k]; });
     if (x.equip && typeof x.equip === 'object') {
@@ -72,6 +81,23 @@
     } catch (e) { /* ignorieren */ }
   }
   A.save = save;
+  const SITE_DOC_REQUIRED = [
+    ['locationId', 'Ort-ID'],
+    ['bePlanId', 'BE-/Lageplanreferenz'],
+    ['bePlanRevision', 'BE-/Lageplanversion'],
+    ['drainageDestination', 'Ableitungsziel'],
+    ['protectionArea', 'Schutzgebietsbezug'],
+    ['floodArea', 'Überschwemmungsbezug'],
+    ['contamination', 'Altlastenstatus'],
+    ['equipmentLocation', 'Standort der Notfallausrüstung'],
+    ['deputyRole', 'Vertretende Funktion']
+  ];
+  A.siteDocsStatus = () => {
+    const o = S.d.siteDocs || {};
+    const missing = SITE_DOC_REQUIRED.filter(([key]) => !String(o[key] || '').trim());
+    return { done: SITE_DOC_REQUIRED.length-missing.length, total: SITE_DOC_REQUIRED.length, missing: missing.map(x => x[1]), complete: missing.length===0 };
+  };
+
 
   A.cleanMine = function (m) {
     const K = window.HavarieKataster;
@@ -266,7 +292,7 @@
       </div>
       <div class="dock__bottom">
         <div class="dock__progress" role="progressbar" aria-label="Durchlaufene Stationen" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct}"><span style="width:${pct}%"></span></div>
-        <span class="dock__count">${A.pflichtSummary()}</span>
+        <span class="dock__count">${A.pflichtSummary()} · Standortkontext ${A.siteDocsStatus().done}/${A.siteDocsStatus().total}</span>
         <button class="dock__toggle industrial-quick-emergency" type="button" data-act="go" data-to="notfall" aria-label="Notfallinformationen direkt öffnen">Notfall</button>
         <button class="dock__toggle" type="button" data-act="nav-toggle" aria-expanded="${!!S.navOpen}" aria-controls="dock-navigation">${S.navOpen ? 'Schließen' : 'Stationen'} <span aria-hidden="true">${S.navOpen ? '↑' : '↓'}</span></button>
       </div>
