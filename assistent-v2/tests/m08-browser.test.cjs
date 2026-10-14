@@ -43,7 +43,7 @@ test('M08 widths 360, 390, 768, 1280, 1920: start view and accessible navigation
  for(const width of [360,390,768,1280,1920]){
   const {page,context,errors}=await openPage(width);
   try{
-   assert.match(await page.locator('#stage').innerText(),/Standortbezogen planen/);
+   assert.match(await page.locator('#stage').innerText(),/Umweltvorsorge/);
    const menu=width<=900?'.industrial-bottom-item':'.industrial-nav-item';
    assert.equal(await page.locator(menu+':visible').count(),5);
    await overflow(page,width,'overview');
@@ -63,7 +63,7 @@ test('M08 emergency data accessible immediately, never misrepresented as approve
   await overflow(page,390,'emergency');
   await page.screenshot({path:path.join(OUT,'emergency-390.png'),fullPage:true});
   await page.locator('.industrial-bottom-item[data-to="start"]').click();
-  assert.match(await page.locator('#stage').innerText(),/Standortbezogen planen/);
+  assert.match(await page.locator('#stage').innerText(),/Umweltvorsorge/);
   checkErrors(errors,'emergency navigation');
  }finally{await context.close();}
 });
