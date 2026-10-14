@@ -9,6 +9,7 @@ on:
     branches:
       - ui-havarie-navigation-20261014
       - modern-industrial-ui-20261014
+      - fix-unit-layout-print-report-20261014
     paths:
       - "assistent-v2/**"
       - "assistent/**"
@@ -52,6 +53,14 @@ jobs:
           assert '.industrial-bottom-nav' in design and '.industrial-sidebar' in design
           assert 'position:fixed' in design and '100dvh' in design
           assert 'window.HavarieEngine' not in industrial
+          result = Path('assistent-v2/assets/js/views-result.js').read_text(encoding='utf-8')
+          form = Path('assistent-v2/assets/js/views-main.js').read_text(encoding='utf-8')
+          printed = Path('assistent-v2/assets/css/report.css').read_text(encoding='utf-8')
+          assert 'reportSheet(res, v, rs)' in result and 'report-sheet' in result
+          assert 'ENTWURF' in result and 'FACHLICH NICHT' in result
+          assert 'unit-picker' in form and '.unit-picker .chips' in printed
+          assert '@media print' in printed and 'A4 portrait' in printed
+          assert 'assets/css/report.css' in page
 
           print('UI checks passed')
           PY

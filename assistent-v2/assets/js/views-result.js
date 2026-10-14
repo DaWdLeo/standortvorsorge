@@ -89,6 +89,54 @@
     return L.join('\n');
   }
 
+  // Separate print dossier: all content is escaped by U.html, never a release document.
+  function reportSheet(res, verdict, reasonsList) {
+    const d = S.d, proj = A.project(), sub = A.currentSubstance();
+    const act = DATA.activities.find(a => a.Taetigkeit_ID === d.activityId);
+    const field = (label, value) => html`<div class="report-field"><dt>${label}</dt><dd>${value === undefined || value === null || value === '' ? 'Nicht angegeben' : value}</dd></div>`;
+    const items = [
+      ['Datum der Auswertung', A.todayIso()], ['Erfasst von', d.creator],
+      ['Standort', proj && proj.Projektbezeichnung], ['Einsatzstelle', A.locationText()],
+      ['Geplanter Zeitraum', (d.start || '–') + ' bis ' + (d.end || '–')],
+      ['Stoff', sub && sub.name], ['Tätigkeit', act && act.Bezeichnung],
+      ['Menge und Gebinde', [d.amount, d.unit, d.quantityClass, d.container].filter(Boolean).join(' · ')],
+      ['Untergrund', d.ground], ['Entwässerung', d.drainage],
+      ['Gewässerbezug', d.water], ['Baugrube', d.excavation],
+      ['Rückhaltung', d.retention], ['Schutzbarrieren', A.barrierText()],
+      ['Gefahrgutbezug', d.dangerousGoods]
+    ];
+    return html`<article class="report-sheet" aria-label="Druckausgabe Vorab-Prüfprotokoll">
+      <header class="report-head"><div><p class="report-kicker">UMWELTVORSORGE / GEFAHRSTOFFE</p><h1>Vorab-Prüfprotokoll</h1>
+        <p>Standortbezogene Vorsorge und Prüfung möglicher Umweltauswirkungen</p></div>
+        <div class="report-seal">ENTWURF<br>FACHLICH NICHT<br>FREIGEGEBEN</div></header>
+      <section class="report-section"><h2>01 · Dokumentangaben</h2>
+        <dl class="report-grid">
+          ${field('Dokumenttyp', 'Nicht freigegebenes Vorab-Prüfprotokoll')}
+          ${field('Erstellt am', A.todayIso())}
+          ${field('Regelwerk', 'Master ' + DATA.meta.master_version)}
+          ${field('Datenstand', String(DATA.meta.exported_at || 'nicht hinterlegt').slice(0, 10))}
+        </dl>
+      </section>
+      <section class="report-section"><h2>02 · Erfasste Angaben</h2><dl class="report-grid">${items.map(x => field(x[0],x[1]))}</dl></section>
+      <section class="report-section"><h2>03 · Vorab-Prüfergebnis</h2>
+        <div class="report-status"><strong>${C.verdicts[verdict.key].title}</strong><p>${C.verdicts[verdict.key].text}</p>
+          <p>Pflichtangaben: ${res.pflicht.progress} von ${res.pflicht.total} · Regeltreffer: ${res.rule_hits} · Sperren: ${res.blocks} · Offene Maßnahmen: ${res.open_count}</p></div>
+      </section>
+      <section class="report-section"><h2>04 · Offene Punkte und Prüfbedarf</h2>
+        ${reasonsList.length ? html`<ol class="report-list">${reasonsList.map(x=>html`<li><strong>${x.title}</strong>${x.text ? html` – ${x.text}` : ''}${x.meta ? html` (${x.meta})` : ''}</li>`)}</ol>` : html`<p>Keine offenen Punkte aus dieser Vorabauswertung. Dies ist keine fachliche Freigabe.</p>`}
+      </section>
+      <section class="report-section"><h2>05 · Maßnahmenstatus</h2>
+        ${res.derived_measures.length ? res.derived_measures.map(x=>html`<div class="report-item"><strong>${x.Titel}</strong><p>${x.Freigegebener_Text}</p><p>Regel: ${x.Ausloesende_Regel_ID} · Quelle: ${x.Quelle_ID}</p></div>`) : html`<p>Keine operativ anzeigbare Maßnahme vorhanden.</p>`}
+        ${res.excluded_measures.length ? html`<p><strong>${res.excluded_measures.length} Maßnahmen nicht anzeigbar.</strong> Fachliche Voraussetzungen oder Ausrüstung prüfen.</p>` : ''}
+      </section>
+      <section class="report-section"><h2>06 · Prüfschritt / weitere Bearbeitung</h2>
+        <p>Dieses Dokument enthält ein automatisches Vorab-Ergebnis auf Basis des hinterlegten Beispielregelwerks. Offene Fragen sind durch die zuständige Fachfunktion anhand der Quellen zu klären.</p>
+      </section>
+      <p class="report-disclaimer"><strong>BEISPIELDATEN – FACHLICH NICHT FREIGEGEBEN.</strong> Kein Havarie- oder Notfallplan, keine Einsatzfreigabe, keine rechtsverbindliche Meldungsentscheidung. Im Ereignisfall ausschließlich die geprüften betrieblichen Unterlagen verwenden.</p>
+      <footer class="report-footer">Havarie-Assistent · Vorab-Prüfprotokoll · Stand ${A.todayIso()} · Version des Regelwerks: ${DATA.meta.master_version}</footer>
+    </article>`;
+  }
+
   A.views.ergebnis = function () {
     const { res } = A.evaluate();
     const v = A.verdict(res), vd = C.verdicts[v.key];
@@ -101,6 +149,7 @@
     S._summary = summaryText(res, v, rs);
 
     return html`
+      ${reportSheet(res, v, rs)}
       <h2 class="vh" id="h-ergebnis" data-heading tabindex="-1">Ergebnis</h2>
       <section class="verdict verdict--${vd.tone}" aria-labelledby="h-verdict">
         ${raw(U.decorative(signSvg))}
@@ -112,7 +161,7 @@
         <button class="btn" type="button" data-act="go" data-to="pruefen">${ico('edit')}Angaben ändern</button>
         <div class="actions__right">
           <button class="btn" type="button" data-act="copy-summary">${ico('copy')}Zusammenfassung kopieren</button>
-          <button class="btn" type="button" data-act="print">${ico('print')}Drucken oder als PDF</button>
+          <button class="btn" type="button" data-act="print">${ico('print')}Prüfprotokoll als PDF</button>
         </div>
       </div>
 
