@@ -52,6 +52,27 @@ test('M08 widths 360, 390, 768, 1280, 1920: start view and accessible navigation
   }finally{await context.close();}
  }
 });
+test('V2 pilot has no yellow example banner and no approval card',async()=>{
+ for(const width of [390,1280]){
+  const {page,context,errors}=await openPage(width);
+  try{
+   assert.equal(await page.locator('#chrome .banner:not(.banner--stop)').count(),0,
+     'retired example-data banner must not reappear');
+   await page.locator('#status-dock').getByText('Freigabe: ausstehend').waitFor();
+   assert.equal(await page.locator('#stage .legacy-release-tile').count(),0);
+   const badges=page.locator('.industrial-pilot-badge');
+   assert.equal(await badges.count(),1,'exactly one pilot identifier, in sidebar');
+   if(width>900)assert.ok(await badges.isVisible());
+   const data=await page.evaluate(()=>({
+    example:window.HavarieApp.DATA.meta.example_data,
+    single:typeof window.HavarieApp.S.d.substanceKey==='string'&&typeof window.HavarieApp.S.d.activityId==='string'
+   }));
+   assert.equal(data.example,true,'V2 cannot imply production-approved data');
+   assert.equal(data.single,true,'V2 is a single-case demonstration');
+   checkErrors(errors,'pilot '+width);
+  }finally{await context.close();}
+ }
+});
 test('M08 emergency data accessible immediately, never misrepresented as approved',async()=>{
  const {page,context,errors}=await openPage(390);
  try{
